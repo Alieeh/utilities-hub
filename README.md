@@ -1,2 +1,2 @@
-# Utilities-hub
+# utilities-hub
 Next.Js project
