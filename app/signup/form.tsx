@@ -3,7 +3,7 @@
 import { signup } from './actions';
 import { BackButton } from "@/components/backButton";
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+//import { redirect } from 'next/navigation';
 import { useActionState } from 'react';
 
 export function SignupForm() {
