@@ -42,3 +42,8 @@ next-env.d.ts
 
 # prisma
 generated/prisma/
+
+# datbease
+dev.db
+*.sqlite
+*.sqlite3

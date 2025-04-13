@@ -6,7 +6,7 @@ import { PrismaClient } from "@/generated/prisma";
 
 const prisma = new PrismaClient();
 
-export async function signup(state, formData) {
+export async function signup(state : any, formData: any) {
 
     const tUsername = formData.get("username").trim();
     const tEmail = formData.get("email").trim();

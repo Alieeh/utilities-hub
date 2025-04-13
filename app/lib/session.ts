@@ -1,6 +1,6 @@
 import 'server-only'
 import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers'; // for Next.js 13+ (app router)
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation'; // for Next.js 13+ (app router)
 import { CookieListItem } from 'next/dist/compiled/@edge-runtime/cookies';
 //import { NextRequest } from 'next/server';
@@ -11,8 +11,12 @@ const key = new TextEncoder().encode(process.env.JWT_SECRET);
 
 const cookie = {
     name: 'session_token',
-    options: {httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/'},
     duration: 60 * 60 * 24 * 1000, // 1 day
+    options: {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: "lax" as "lax", 
+        path: '/'},
 }
 // the difference with secure=true????
 
@@ -33,7 +37,7 @@ export async function encrypt(payload : {userId: number, expires: Date}) {
     .sign(key);
 }
 
-export async function decrypt(session) {
+export async function decrypt(session: any) {
     try {
         const { payload } = await jwtVerify(session, key, {algorithms: ['HS256']});
         return payload;
@@ -48,7 +52,9 @@ export async function createSession(userId: number){
     const expires = new Date(Date.now() + cookie.duration);
     const session = await encrypt({userId, expires});
 
-    cookies().set(cookie.name, session, { ...cookie.options, expires });
+    const cookieStore = await cookies();
+    cookieStore.set(cookie.name, session, { ...cookie.options, expires });
+    
     redirect('/dashboard');
 }
 
