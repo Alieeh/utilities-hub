@@ -7,12 +7,17 @@ import { PrismaClient } from "@/generated/prisma";
 const prisma = new PrismaClient();
 
 export async function signup(state, formData) {
+
+    const tUsername = formData.get("username").trim();
+    const tEmail = formData.get("email").trim();
+    const tPassword = formData.get("password").trim();
+
     // 1. Validate the form data
     const validationResult =  signUpformSchema.safeParse(
         {
-            username: formData.get("username"),
-            email: formData.get("email"),
-            password: formData.get("password"),
+            username: tUsername,
+            email: tEmail,
+            password: tPassword,
         });
 
         if (!validationResult.success) {
@@ -29,12 +34,12 @@ export async function signup(state, formData) {
 
         // Check if the username already exists in the database
         const existingUsername = await prisma.user.findUnique({
-            where: { username: formData.get("username") },
+            where: { username: tUsername },
         });
         
 
         const existingEmail = await prisma.user.findUnique({
-            where: { email: formData.get("email") },
+            where: { email: tEmail },
         });
         
 
