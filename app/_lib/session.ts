@@ -2,9 +2,6 @@ import 'server-only'
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation'; // for Next.js 13+ (app router)
-import { CookieListItem } from 'next/dist/compiled/@edge-runtime/cookies';
-//import { NextRequest } from 'next/server';
-
 
 const key = new TextEncoder().encode(process.env.JWT_SECRET);
 

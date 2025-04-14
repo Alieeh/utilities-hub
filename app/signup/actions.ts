@@ -1,7 +1,7 @@
 'use server'
 
-import { createSession } from "../lib/session";
-import { signUpformSchema } from "../lib/validation/signUpformSchema";
+import { createSession } from "../_lib/session";
+import { signUpformSchema } from "../_lib/validation/signUpformSchema";
 import { PrismaClient } from "@/generated/prisma";
 
 const prisma = new PrismaClient();

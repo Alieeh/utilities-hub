@@ -2,7 +2,7 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 import {cookies} from "next/headers";
-import { decrypt } from "@/app/lib/session";
+import { decrypt } from "@/app/_lib/session";
 
 export default async function middleware(req: NextRequest) {
     // 1.Check if route is protected

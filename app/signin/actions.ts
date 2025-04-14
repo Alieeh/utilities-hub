@@ -1,6 +1,6 @@
 'use server'
 
-import { createSession } from "../lib/session";
+import { createSession } from "../_lib/session";
 import { PrismaClient } from "@/generated/prisma";
 
 const prisma = new PrismaClient();
