@@ -6,71 +6,53 @@ import { PrismaClient } from "@/generated/prisma";
 
 const prisma = new PrismaClient();
 
-export async function signup(state : any, formData: any) {
+export async function signup(state: any, formData: any) {
 
-    const tUsername = formData.get("username").trim();
-    const tEmail = formData.get("email").trim();
-    const tPassword = formData.get("password").trim();
-
-    // 1. Validate the form data
-    const validationResult =  signUpformSchema.safeParse(
-        {
-            username: tUsername,
-            email: tEmail,
-            password: tPassword,
-        });
+    // 1. Validate the form data using Zod
+    const validationResult =  signUpformSchema.safeParse(Object.fromEntries(formData));
 
         if (!validationResult.success) {
+            
             return { 
                 errors: validationResult.error.flatten().fieldErrors,
-                values:{
-                    username: formData?.get("username") || null,
-                    email: formData?.get("email") || null,
-                    password: formData?.get("password") || null,
-                }
-                
-            };
-        }
-
-        // Check if the username already exists in the database
-        const existingUsername = await prisma.user.findUnique({
-            where: { username: tUsername },
-        });
-        
-
-        const existingEmail = await prisma.user.findUnique({
-            where: { email: tEmail },
-        });
-        
-
-        if (existingEmail) {
-            // If the username or email already exists, return an error
-            return {
-                errors: {email: ["This email address is existed"] },
                 values: {
                     username: formData?.get("username") || null,
                     email: formData?.get("email") || null,
                     password: formData?.get("password") || null,
-                },
+                }
+                // ^ the current values of the form sent again to the client to be used in the form
+                // | to avoid losing the values when the validation fails
+            };
+        }
+
+        const { username, email, password } = validationResult.data;
+
+        // 2. Check if the user already exists in the database
+        const existingUsername = await prisma.user.findUnique({
+            where: { username: username },
+        });
+        
+        const existingEmail = await prisma.user.findUnique({
+            where: { email: email },
+        });
+        
+        
+        if (existingEmail) {
+            // If the username or email already exists, return an error
+            return {
+                errors: {email: ["This email address is existed"] },
+                values: validationResult.data,
             };
         }
         if (existingUsername) {
             // If the username or email already exists, return an error
             return {
                 errors: {username: ["Username is already taken"] },
-                values: {
-                    username: formData?.get("username") || null,
-                    email: formData?.get("email") || null,
-                    password: formData?.get("password") || null,
-                },
+                values: validationResult.data,
             };
         }
 
-        const { username, email, password } = validationResult.data;
-
-    // 2. Check if the user already exists
-        // todo: check if the user already exists
-
+        
     // 3.create a new user
     const bcrypt = require('bcrypt');
     const hashedPassword = await bcrypt.hash(password, 10);

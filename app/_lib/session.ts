@@ -3,12 +3,17 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation'; // for Next.js 13+ (app router)
 
+type SessionPayload = {
+    userId: number;
+    expires: Date;
+}   
+
 const key = new TextEncoder().encode(process.env.JWT_SECRET);
 
 
 const cookie = {
     name: 'session_token',
-    duration: 60 * 60 * 24 * 1000, // 1 day
+    duration: 60 * 60 * 24 * 1, //in seconds, 1 day
     options: {
         httpOnly: true, 
         secure: process.env.NODE_ENV === 'production', 
@@ -18,15 +23,7 @@ const cookie = {
 // the difference with secure=true????
 
 
-// Payload type
-// export interface SessionPayload extends Record<string, unknown> {
-//     userId: number;
-//     username: string;
-//     email: string;
-//   }
-
-
-export async function encrypt(payload : {userId: number, expires: Date}) {
+export async function encrypt(payload : SessionPayload) {
     return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -34,11 +31,18 @@ export async function encrypt(payload : {userId: number, expires: Date}) {
     .sign(key);
 }
 
-export async function decrypt(session: any) {
+export async function decrypt(session: string | undefined) {
     try {
-        const { payload } = await jwtVerify(session, key, {algorithms: ['HS256']});
+        if (!session) {
+            throw new Error('Session is undefined');
+        }
+        const { payload } = await jwtVerify(session, key, {
+            algorithms: ['HS256'],
+        });
         return payload;
+        // payload contains the userId and expires Date
     } catch (err) {
+        console.error('Faild to verify session:', err);
         return null;
     }
 }
@@ -65,5 +69,7 @@ export async function verifySession() {
 
 export async function deleteSession() {
     (await cookies()).delete(cookie.name);
+    console.log('Session deleted');
     redirect('/login');
+    // session deleted, redirect to login page
 }

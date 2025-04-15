@@ -6,10 +6,23 @@ import { PrismaClient } from "@/generated/prisma";
 const prisma = new PrismaClient();
 
 export async function login(state : any, formData: any) {
+    // Check if the formData is empty or not
+    // but The button is already disabled if the form is empty
+
+
+    if (!formData) {
+        return { error: 'No form data provided',
+            values: {
+                email: formData?.get("email") || null,
+                password: formData?.get("password") || null,
+            }
+         };
+    }
+
     const tEmail = formData.get("email").trim();
     const tPassword = formData.get("password").trim();
 
-
+    // get the user from the database
     const user = await prisma.user.findUnique({
         where: { email: tEmail },
     });
