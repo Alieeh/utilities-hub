@@ -10,13 +10,13 @@ type SessionPayload = {
 
 const key = new TextEncoder().encode(process.env.JWT_SECRET);
 
-
-const cookie = {
+const cookieDuration = 60 * 60 * 24 * 1; // in seconds, 1 day
+const cookieDetails = {
     name: 'session_token',
-    duration: 60 * 60 * 24 * 1, //in seconds, 1 day
+    duration: cookieDuration * 1000, //in mili seconds, 1 day
     options: {
         httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', 
+        secure: process.env.NODE_ENV === "production", 
         sameSite: "lax" as "lax", 
         path: '/'},
 }
@@ -27,7 +27,7 @@ export async function encrypt(payload : SessionPayload) {
     return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime(`${cookie.duration}s`)
+    .setExpirationTime(`${cookieDuration}s`)
     .sign(key);
 }
 
@@ -50,25 +50,31 @@ export async function decrypt(session: string | undefined) {
 
 
 export async function createSession(userId: number){
-    const expires = new Date(Date.now() + cookie.duration);
+    const expires = new Date(Date.now() + cookieDetails.duration);
     const session = await encrypt({userId, expires});
 
     const cookieStore = await cookies();
-    cookieStore.set(cookie.name, session, { ...cookie.options, expires });
-    
-    redirect('/dashboard');
+    cookieStore.set(
+        cookieDetails.name,
+        session,
+        { ...cookieDetails.options, expires }
+    );
 }
 
-export async function verifySession() {
-    const cookie = (await cookies()).get(cookies.name)?.value;
+export async function verifySession()  {
+    const cookieStore = await cookies();
+    const cookie = cookieStore.get(cookieDetails.name)?.value;
+    if (!cookie) {
+        return null;
+    }
     const session = await decrypt(cookie);
-    if (!session?.userId) {
-        redirect('/login');
-    }else return {userId: session.userId}
+    if (session?.userId) {
+        return {userId: session.userId}
+    }
 }
 
 export async function deleteSession() {
-    (await cookies()).delete(cookie.name);
+    (await cookies()).delete(cookieDetails.name);
     console.log('Session deleted');
     redirect('/login');
     // session deleted, redirect to login page

@@ -1,16 +1,14 @@
-import Link from 'next/link';
 import React from 'react';
+import UserProfile from './userProfile';
 
 const Header: React.FC = () => {
     return (
-        <header className="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-300">
-            {/* <div>
-                <img src="/logo.png" alt="Logo" className="h-10" />
-            </div> */}
-            <div className="flex gap-4">
-                <Link href={"/signin"} className="text-blue-500 cursor-pointer hover:underline">Sign in</Link>
-                <Link href={"/signup"} className="text-blue-500 cursor-pointer hover:underline">Sign up</Link>
+        <header className="flex justify-between items-center p-4 bg-gray-900">
+            <div>
+                <img src= "UH-LOGO-COLORED-C.png" alt="Logo" className="ml-5 h-20 w-auto cursor-pointer" />
             </div>
+            <UserProfile/>
+            
         </header>
     );
 };

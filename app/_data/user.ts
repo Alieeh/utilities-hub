@@ -4,15 +4,19 @@ import { cache } from "react";
 
 export const getUser = cache(async () => {
     // 1. Verify user's session
-    const session = await verifySession();
-    //veryfySession will redirect to login if session is invalid
-
+    const session = await verifySession() as { userId: number | null };
     // 2. Fetch user data from the database
-    const prisma = new PrismaClient();
-    const userData = await prisma.user.findUnique({
-        where: { id: session.userId },
-        // columns: { id: true, username: true, email: true },
-    });
+    if (session?.userId) {
+        const prisma = new PrismaClient();
+        const userData = await prisma.user.findUnique({
+            where: { id: session.userId },
+            // columns: { id: true, username: true, email: true },
+            select: { id: true, username: true, email: true },
+        })
+        return userData;;
+    }else{
+        return null;
+    }
 
-    return userData;
+    
 });

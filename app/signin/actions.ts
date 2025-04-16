@@ -1,5 +1,6 @@
 'use server'
 
+import { redirect } from 'next/navigation';
 import { createSession } from "../_lib/session";
 import { PrismaClient } from "@/generated/prisma";
 
@@ -50,11 +51,11 @@ export async function login(state : any, formData: any) {
          };
   }
      // ✅ Login success
-    console.log("Login successful for user:", user.email);
-
     // Create a session for the user, creatSession will 
     // set the cookie then redirect to dashboard
     await createSession(user.id);
+    console.log("Login successful for user:", user.email);
+    redirect('/');
     
 }
 

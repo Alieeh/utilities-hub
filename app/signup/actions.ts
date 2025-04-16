@@ -1,5 +1,6 @@
 'use server'
 
+import { redirect } from "next/navigation";
 import { createSession } from "../_lib/session";
 import { signUpformSchema } from "../_lib/validation/signUpformSchema";
 import { PrismaClient } from "@/generated/prisma";
@@ -65,4 +66,5 @@ export async function signup(state: any, formData: any) {
     // 4. Create a session
     await createSession(user.id);
     //stateless session, means we only store the session in the cookie (local), not in the database
+    redirect('/');
 }
