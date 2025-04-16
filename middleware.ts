@@ -4,26 +4,40 @@ import { type NextRequest, NextResponse } from "next/server";
 import {cookies} from "next/headers";
 import { decrypt } from "@/app/_lib/session";
 
+const protectedRoutes = ["/dashboard", "/settings", "/profile"];
+const authPages = ["/signin", "/signup"];
+// Routes that should be inaccessible **if user IS logged in**
+
 export default async function middleware(req: NextRequest) {
-    // 1.Check if route is protected
-    const protectedRoutes = ["/dashboard", "/settings", "/profile"];
     const currentPath = req.nextUrl.pathname;
-    const isProtectedRoute = protectedRoutes.includes(currentPath);
-    //console.log("middleware isProtectedRoute: ", isProtectedRoute, currentPath);
 
-    if (isProtectedRoute){
-        // 2. Check for valid session
-        console.log("middleware session Checking...");
-        const cookieStore = await cookies();
-        const cookie = cookieStore.get("session_token")?.value;
+    let isAuthenticated = false;
+
+    const cookieStore = await cookies();
+    const cookie = cookieStore.get("session_token")?.value;
+
+    // ✅ Validate token
+    if (cookie) {
         const session = await decrypt(cookie);
-
-        // 3. If session is invalid, redirect to login page
+        // isAuthenticated = !!session;
         if (!session?.userId) {
-            return NextResponse.redirect(new URL("/signin", req.nextUrl));
+            isAuthenticated = false;
+        }else{
+        isAuthenticated = true;
         }
     }
-    // 4. Render route
+
+      // 🚫 Redirect authenticated users away from auth pages
+    if (isAuthenticated && authPages.includes(currentPath)) {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+    
+      // 🔐 Redirect unauthenticated users away from protected routes
+      if (!isAuthenticated && protectedRoutes.includes(currentPath)) {
+        return NextResponse.redirect(new URL("/signin", req.url));
+      }
+
+    // ✅ Allow request through
     return NextResponse.next();
 }
 
@@ -35,3 +49,13 @@ export const config = {
     matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
     //matcher: ["/dashboard/:path*", "/settings/:path*", "/profile/:path*"]
 };
+
+// export const config = {
+//     matcher: [
+//       "/dashboard/:path*",
+//       "/profile/:path*",
+//       "/settings/:path*",
+//       "/signin",
+//       "/signup",
+//     ],
+//   };
