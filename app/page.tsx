@@ -2,11 +2,11 @@ import Header from "@/components/header";
 
 export default function Home() {
   return (
-    <div className="">
+    <div className="w-screen h-screen bg-amber-50">
       <Header/>
-      <main className="">
-        
-      </main>
+      <div className="">
+
+      </div>
     </div>
   );
 }

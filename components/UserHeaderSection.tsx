@@ -2,20 +2,18 @@
 import { getUser } from '@/app/_data/user'
 import Link from 'next/link'
 import React from 'react'
+import UserMenu from './UserMenu'
 
-const UserProfile = async () => {
+
+
+const UserHeaderSection = async () => {
     const userData = await getUser();
     console.log("User data: ", userData);
     if(userData){
         return (
-            <div className="flex flex-row justify-end items-center w-auto gap-8 h-15">
-                <p className="text-white">Hi {userData.username}!</p>
-                <Link 
-                    href={"/dashboard"} 
-                    className="text-blue-500 rounded-xl bg-gray-100 px-5 py-3 cursor-pointer hover:underline"
-                    >
-                    Profile
-                </Link>
+            <div className="flex flex-row justify-end items-center w-auto gap-4">
+                <p className="text-white font-bold md:text-2xl">Hi {userData.username}!</p>
+                <UserMenu/>
             </div>
         )
     }else{
@@ -30,4 +28,4 @@ const UserProfile = async () => {
      }
 }
 
-export default UserProfile
+export default UserHeaderSection

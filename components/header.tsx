@@ -1,13 +1,12 @@
 import React from 'react';
-import UserProfile from './userProfile';
+import UserHeaderSection from './UserHeaderSection';
+
 
 const Header: React.FC = () => {
     return (
-        <header className="flex justify-between items-center p-4 bg-gray-900">
-            <div>
-                <img src= "UH-LOGO-COLORED-C.png" alt="Logo" className="ml-5 h-20 w-auto cursor-pointer" />
-            </div>
-            <UserProfile/>
+        <header className="flex justify-between items-center w-full px-4 py-3 bg-gray-900">
+            <img src= "UH-LOGO-COLORED-C.png" alt="Logo" className="size-11 md:size-16 ml-2 w-auto cursor-pointer" />
+            <UserHeaderSection/>
             
         </header>
     );

@@ -47,8 +47,6 @@ export async function decrypt(session: string | undefined) {
     }
 }
 
-
-
 export async function createSession(userId: number){
     const expires = new Date(Date.now() + cookieDetails.duration);
     const session = await encrypt({userId, expires});
@@ -76,6 +74,4 @@ export async function verifySession()  {
 export async function deleteSession() {
     (await cookies()).delete(cookieDetails.name);
     console.log('Session deleted');
-    redirect('/login');
-    // session deleted, redirect to login page
 }
