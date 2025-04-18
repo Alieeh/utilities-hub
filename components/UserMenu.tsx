@@ -6,6 +6,8 @@ import { faUser, faChevronRight, faChevronDown } from "@fortawesome/free-solid-s
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "@/app/actions/logout"; // ← your server action
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,8 +15,12 @@ export default function UserMenu() {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
+  const toggleMenu = () => {
+    setIsOpen((prev) => !prev);
+    if (isOpen) setShowConfirm(false);
+  }
 
-  const handleLogout = () => setShowConfirm(true); // Show confirm modal
+  const toggleLogout = () => setShowConfirm((prev) => !prev); // Toggle confirmation modal
 
   const confirmLogout = () => {
     setShowConfirm(false);
@@ -24,18 +30,19 @@ export default function UserMenu() {
     });
   };
 
-  const toggleMenu = () => setIsOpen((prev) => !prev);
+  
 
   return (
-    <div className="relative">
+    <div className = "relative">
+    {isOpen && <div className="fixed inset-0 w-full h-full bg-gray-900/10" onClick={toggleMenu}> </div>}
       {/* Button Container */}
       <button
         onClick={toggleMenu}
-        className="flex justify-between items-center w-18 h-8 md:w-24 md:h-12 md:px-7 px-4 bg-white rounded-full hover:bg-gray-100 transition">
-        <FontAwesomeIcon icon={faUser} className="text-gray-700" />
+        className="flex justify-between items-center w-18 h-8 px-4 md:w-20 md:h-9 md:px-5 bg-emerald-700 border-2 border-emerald-400 rounded-full hover:bg-emerald-600 transition">
+        <FontAwesomeIcon icon={faUser} className="text-emerald-400" />
         <FontAwesomeIcon
           icon={isOpen ? faChevronDown : faChevronRight}
-          className="text-gray-500 transition-transform duration-300"
+          className="text-emerald-400 transition-transform duration-300"
         />
       </button>
 
@@ -47,40 +54,34 @@ export default function UserMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-48 bg-white border rounded">
-            <ul className="flex flex-col text-black">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={handleLogout}>Logout</li>
+            className="absolute right-0 mt-2 w-27 bg-white border rounded-lg font-semibold">
+            <ul className="flex flex-col text-black p-1">
+              <li className="px-4 py-2 hover:bg-gray-100 hover:rounded-lg cursor-pointer"> <Link href={"/dashboard"}>Profile</Link></li>
+              <li className="px-4 py-2 hover:bg-gray-100 hover:rounded-lg cursor-pointer"><Link href={"/dashboard/settings"}>Settings</Link></li>
+              <li className="px-4 py-2 hover:bg-gray-100 hover:rounded-lg cursor-pointer" onClick={toggleLogout}>Logout</li>
+              
+              {/* Confirmation Modal */}
+              {showConfirm && (
+              <motion.div 
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col items-center justify-center gap-1 text-sm p-1">
+                    <div className="h-px bg-gray-300 w-full"></div>
+                    <button
+                      onClick={confirmLogout}
+                      className="w-full py-1 rounded bg-red-500 hover:bg-red-600 text-white">
+                      Logout
+                    </button>
+              </motion.div>
+      )}
             </ul>
           </motion.div>
         )}
       </AnimatePresence>
 
- {/* Confirmation Modal */}
- {showConfirm && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[999]">
-          <div className="bg-white rounded-lg p-6 w-auto max-w-sm">
-            <h3 className="text-black text-center font-semibold mb-4">Are you sure you want to logout?</h3>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmLogout}
-                className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
-              >
-                Yes, Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </div>
+ 
+      </div>
   );
 }
