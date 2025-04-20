@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation';
-import { createSession } from "../_lib/session";
+import { createSession } from "../../_lib/session";
 import { PrismaClient } from "@/generated/prisma";
 
 const prisma = new PrismaClient();

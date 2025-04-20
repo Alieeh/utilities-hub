@@ -5,11 +5,8 @@ import { cache } from "react";
 export const getUser = cache(async () => {
     // 1. Verify user's session
     const session = await verifySession() as { userId: number | null };
-    if (!session?.userId){
-        throw new Error("Session is not valid or expired");
-    }
     // 2. Fetch user data from the database
-    else{ 
+    if(session?.userId){ 
         const prisma = new PrismaClient();
         const userData = await prisma.user.findUnique({
             where: { id: session.userId },

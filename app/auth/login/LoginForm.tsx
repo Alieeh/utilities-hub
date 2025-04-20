@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { useActionState } from "react";
 import { login } from "./actions";
 
-export default function LoginForm() {
+export function LoginForm() {
     const formRef = useRef<HTMLFormElement>(null);
     const [state, action, pending] = useActionState(login, undefined);
 

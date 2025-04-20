@@ -20,7 +20,7 @@ const UserHeaderSection = async () => {
     }else{
         return (
           <div className="flex flex-row justify-center items-center gap-2 p-2 max-w-60 h-15 font-bold text-sm ">
-                  <Link href={"/signin"} className="text-emerald-500 p-3 py-2 rounded-xl bg-emerald-950 cursor-pointer ">Sign in</Link>
+                  <Link href={"/auth"} className="text-emerald-500 p-3 py-2 rounded-xl bg-emerald-950 cursor-pointer ">Sign in</Link>
           </div>
         )
      }
