@@ -2,7 +2,7 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 import {cookies} from "next/headers";
-import { decrypt } from "@/app/_lib/session";
+import { decrypt } from "@/app/_lib (old)/session";
 
 const protectedRoutes = ["/dashboard", "/settings", "/profile"];
 const authPages = ["/signin", "/signup"];
