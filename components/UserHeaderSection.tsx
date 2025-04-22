@@ -1,5 +1,5 @@
 "use server"
-import { getUser } from '@/app/_data/user'
+import { getUser } from '@/app/_data (old)/user'
 import Link from 'next/link'
 import React from 'react'
 import UserMenu from './UserMenu'

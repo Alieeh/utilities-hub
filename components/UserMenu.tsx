@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faChevronRight, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { motion, AnimatePresence } from "framer-motion";
-import { logout } from "@/app/actions/logout"; // ← your server action
+import { logout } from "@/app/actions (old)/logout"; // ← your server action
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
