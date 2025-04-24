@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "app/generated/prisma/client"
+  // output   = "app/generated/prisma/client"
 }
 
 
@@ -17,6 +17,17 @@ datasource db {
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
+//every time you change the schema:
+//run this:
+// npx prisma migrate reset (do it in dev, it will delete everything) 
+// npx prisma db push (to sync tables to db)
+//npx prisma generate
+
 model User {
   id            String          @id @default(cuid())
   name          String?
@@ -24,6 +35,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  role          UserRole @default(USER)
   accounts      Account[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

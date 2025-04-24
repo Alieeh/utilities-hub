@@ -14,7 +14,6 @@ import { Button } from '../ui/button';
 import { FormError } from '../form-error';
 import { FormSuccess } from '../form-success';
 import { login } from '@/actions/login';
-import { start } from 'repl';
 
 
 export const LoginForm = () => {
@@ -37,9 +36,9 @@ export const LoginForm = () => {
         setSuccess("");
         startTransition(()=> {
             login(values)
-            .then((data) => {
-                setError(data.error);
-                setSuccess(data.success)
+            .then((data:any) => {
+                setError(data.error ? data.error : "");
+                setSuccess(data.success ? data.success : "");
             });
         })
         
@@ -49,7 +48,7 @@ export const LoginForm = () => {
         <CardWrapper 
             headerLabel="Welcome Back!"
             backButtonLabel="Don't have an account?"
-            backButtonHref="/auth/register"
+            backButtonHref="/register"
             showSocial >
             
             <Form {...form}>

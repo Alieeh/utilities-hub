@@ -6,7 +6,9 @@ export const LoginSchema = z.object({
 });
 
 export const RegisterSchema = z.object({
+    name: z.string().nonempty("Name is required"),
     email: z.string().nonempty("Email is required").email("Invalid email address"),
     password: z.string().min(6,"Minimum 6 characters required!"),
-    name: z.string().nonempty("Name is required"),
+    confirmPassword: z.string().min(6,"Minimum 6 characters required!"),
+    
 });

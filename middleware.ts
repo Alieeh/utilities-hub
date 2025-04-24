@@ -1,61 +1,50 @@
-'user-server'
+import NextAuth from "next-auth"
+import authConfig from "./auth.config"
+import { 
+  DEFAULT_LOGIN_REDIRECT,
+  authRoutes,
+  apiAuthPrefix,
+  publicRoutes 
+} from "./routes"
 
-import { type NextRequest, NextResponse } from "next/server";
-import {cookies} from "next/headers";
-import { decrypt } from "@/app/_lib (old)/session";
 
-const protectedRoutes = ["/dashboard", "/settings", "/profile"];
-const authPages = ["/signin", "/signup"];
-// Routes that should be inaccessible **if user IS logged in**
 
-export default async function middleware(req: NextRequest) {
-    const currentPath = req.nextUrl.pathname;
+const { auth } = NextAuth(authConfig)
 
-    let isAuthenticated = false;
+export default auth((req) => {
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
 
-    const cookieStore = await cookies();
-    const cookie = cookieStore.get("session_token")?.value;
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-    // ✅ Validate token
-    if (cookie) {
-        const session = await decrypt(cookie);
-        // isAuthenticated = !!session;
-        if (!session?.userId) {
-            isAuthenticated = false;
-        }else{
-        isAuthenticated = true;
-        }
+  //first allow every single API routes
+  if (isApiAuthRoute){
+    return null;
+  }
+
+  if (isAuthRoute){
+    if(isLoggedIn){
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
     }
+    return null;
+  }
 
-      // 🚫 Redirect authenticated users away from auth pages
-    if (isAuthenticated && authPages.includes(currentPath)) {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-    
-      // 🔐 Redirect unauthenticated users away from protected routes
-      if (!isAuthenticated && protectedRoutes.includes(currentPath)) {
-        return NextResponse.redirect(new URL("/signin", req.url));
-      }
+  if(!isLoggedIn && !isPublicRoute) {
+    return Response.redirect(new URL("/login", nextUrl));
+  }
 
-    // ✅ Allow request through
-    return NextResponse.next();
-}
+  return null;
+
+});
 
 
-
-
-// Routes midleware should NOT run on.
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-    //matcher: ["/dashboard/:path*", "/settings/:path*", "/profile/:path*"]
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };
-
-// export const config = {
-//     matcher: [
-//       "/dashboard/:path*",
-//       "/profile/:path*",
-//       "/settings/:path*",
-//       "/signin",
-//       "/signup",
-//     ],
-//   };

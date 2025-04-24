@@ -26,13 +26,14 @@ export const RegisterForm = () => {
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
         defaultValues: {
+            name: "",
             email: "",
             password: "",
-            name: "",
+            confirmPassword: "",
         }
     })
 
-    const onSubmit = (values: z.infer<typeof RegisterSchema>) =>{
+    const onSubmit = async (values: z.infer<typeof RegisterSchema>) =>{
         setError("");
         setSuccess("");
         
@@ -50,7 +51,7 @@ export const RegisterForm = () => {
         <CardWrapper 
             headerLabel="Create an account!"
             backButtonLabel="Already have an account?"
-            backButtonHref="/auth/login"
+            backButtonHref="/login"
             showSocial >
             
             <Form {...form}>
@@ -96,6 +97,23 @@ export const RegisterForm = () => {
                         render = {({ field }) => (
                             <FormItem> 
                                 <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                    <Input
+                                    disabled={isPending}
+                                    {...field}
+                                    placeholder="******"
+                                    type="password" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField 
+                        control = {form.control}
+                        name = "confirmPassword"
+                        render = {({ field }) => (
+                            <FormItem> 
+                                <FormLabel>Password confirmation</FormLabel>
                                 <FormControl>
                                     <Input
                                     disabled={isPending}
