@@ -1,4 +1,5 @@
 import Google from "next-auth/providers/google"
+import Github from "next-auth/providers/github"
 import Credentials from "next-auth/providers/credentials"
 import type { NextAuthConfig } from "next-auth"
 import { LoginSchema } from "./schemas";
@@ -9,6 +10,8 @@ import bcrypt from "bcryptjs";
 export default {
      providers: 
      [Google,
+      // google will automatically get the env variables from the .env file
+      Github,
       Credentials({
         async authorize(credentials) {
             const validatedFields = LoginSchema.safeParse(credentials);

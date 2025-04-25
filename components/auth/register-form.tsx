@@ -14,6 +14,7 @@ import { Button } from '../ui/button';
 import { FormError } from '../form-error';
 import { FormSuccess } from '../form-success';
 import { register } from '@/actions/register';
+import { redirect } from 'next/dist/server/api-utils';
 
 
 export const RegisterForm = () => {
@@ -51,7 +52,7 @@ export const RegisterForm = () => {
         <CardWrapper 
             headerLabel="Create an account!"
             backButtonLabel="Already have an account?"
-            backButtonHref="/login"
+            backButtonHref="/auth/login"
             showSocial >
             
             <Form {...form}>

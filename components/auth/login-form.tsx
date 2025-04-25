@@ -14,9 +14,14 @@ import { Button } from '../ui/button';
 import { FormError } from '../form-error';
 import { FormSuccess } from '../form-success';
 import { login } from '@/actions/login';
-
+import { useSearchParams } from 'next/navigation';
 
 export const LoginForm = () => {
+    // getting passed (error) additioned url by providers 
+    const searchParams = useSearchParams();
+    const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
+    ? "Email already in use with different provider": "";
+
     // setting these after form validation in our server action
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
@@ -36,9 +41,10 @@ export const LoginForm = () => {
         setSuccess("");
         startTransition(()=> {
             login(values)
-            .then((data:any) => {
-                setError(data.error ? data.error : "");
-                setSuccess(data.success ? data.success : "");
+            .then((data) => {
+                setError(data?.error);
+                // TODO: Add when we add 2FA
+                // setSuccess(data?.success);
             });
         })
         
@@ -48,7 +54,7 @@ export const LoginForm = () => {
         <CardWrapper 
             headerLabel="Welcome Back!"
             backButtonLabel="Don't have an account?"
-            backButtonHref="/register"
+            backButtonHref="/auth/register"
             showSocial >
             
             <Form {...form}>
@@ -89,7 +95,7 @@ export const LoginForm = () => {
                         )}
                         />
                     </div>
-                    <FormError message={error} />
+                    <FormError message={error || urlError } />
                     <FormSuccess message={success}/>
                     <Button
                     type = "submit"
