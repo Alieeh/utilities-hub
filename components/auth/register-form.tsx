@@ -14,7 +14,9 @@ import { Button } from '../ui/button';
 import { FormError } from '../form-error';
 import { FormSuccess } from '../form-success';
 import { register } from '@/actions/register';
-import { redirect } from 'next/dist/server/api-utils';
+import { redirect } from 'next/navigation'
+import Link from 'next/link';
+
 
 
 export const RegisterForm = () => {
@@ -42,9 +44,10 @@ export const RegisterForm = () => {
             register(values)
             .then((data) => {
                 setError(data.error);
-                setSuccess(data.success)
+                setSuccess(data.success);
             });
         })
+        
         
     };
 
@@ -55,11 +58,12 @@ export const RegisterForm = () => {
             backButtonHref="/auth/login"
             showSocial >
             
-            <Form {...form}>
+            <Form {...form} >
                 <form onSubmit= {form.handleSubmit(onSubmit)}
                 className="space-y-6">
                     <div className='space-y-4'>
-                    <FormField 
+                    <FormField
+                        disabled = {!!success}
                         control = {form.control}
                         name = "name"
                         render = {({ field }) => (
@@ -76,6 +80,7 @@ export const RegisterForm = () => {
                         )}
                         />
                         <FormField 
+                        disabled = {!!success}
                         control = {form.control}
                         name = "email"
                         render = {({ field }) => (
@@ -93,6 +98,7 @@ export const RegisterForm = () => {
                         )}
                         />
                         <FormField 
+                        disabled = {!!success}
                         control = {form.control}
                         name = "password"
                         render = {({ field }) => (
@@ -110,6 +116,7 @@ export const RegisterForm = () => {
                         )}
                         />
                         <FormField 
+                        disabled = {!!success}
                         control = {form.control}
                         name = "confirmPassword"
                         render = {({ field }) => (
@@ -132,9 +139,14 @@ export const RegisterForm = () => {
                     <Button
                     type = "submit"
                     className='w-full'
-                    disabled={isPending}>
+                    disabled={isPending || !!success}>
                         Create an account
                     </Button>
+                    {/* { success && (
+                    <Link href="/auth/login">
+                        <Button variant="secondary" className='w-full'>Go to login page</Button>
+                  </Link>
+                )} */}
                 </form>
             </Form>
 

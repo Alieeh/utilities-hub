@@ -9,7 +9,6 @@ import { Loader2 } from 'lucide-react'
 
 const UserHeaderSection = async () => {
         const session = await auth();
-        console.log({session})
         
         return (
           <div className="flex justify-center items-center gap-2 p-2 max-w-60 h-15 ">

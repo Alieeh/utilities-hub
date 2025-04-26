@@ -1,10 +1,14 @@
+export const domainName = "http://localhost:3000"
+
 /** 
 * An array of public routes that do not 
 * require authentication
 * @type {string[]}
 */
 export const publicRoutes = [
-    "/"
+    "/",
+    "/auth",
+    "/auth/new-verification",
 ];
 
 

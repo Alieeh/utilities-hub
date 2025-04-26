@@ -21,6 +21,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     error: "/auth/error",
   },
   events: {
+    // Automaically set emailVerified for OAuth users
     async linkAccount({ user }) {
       await db.user.update({
         where: { id: user.id },
@@ -29,13 +30,23 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }
   },
   callbacks : {
-    // async signIn({ user }) {
-    //   const existingUser = await getUserById(user.id);
-    //   if (!existingUser || !existingUser.emailVerified) {
-    //     return false;
-    //   }
-    //   return true
-    // },
+    async signIn({ user, account }) {
+      
+      if (!user.id) return false;
+
+      // Allow OAuth users without email verification
+      if (account?.provider !== "credentials") return true;
+      
+      // Prevent sign in without email verification ( we also prevent inside login action too)
+      const existingUser = await getUserById(user.id);
+      if (!existingUser || !existingUser?.emailVerified) {
+        return false;
+      }
+
+      // TODO: Add 2FA check
+
+      return true
+    },
     async session({ session, user, token }) {
       // console.log({sessionToken: token})
       // Add the user +id and +role into the session object to access to it in our app
