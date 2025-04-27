@@ -142,11 +142,11 @@ export const RegisterForm = () => {
                     disabled={isPending || !!success}>
                         Create an account
                     </Button>
-                    {/* { success && (
+                    { success && (
                     <Link href="/auth/login">
-                        <Button variant="secondary" className='w-full'>Go to login page</Button>
+                        <Button variant="secondary" className='w-full h-15'>Go to login page</Button>
                   </Link>
-                )} */}
+                )}
                 </form>
             </Form>
 

@@ -12,7 +12,7 @@ export const sendVerificationEmail = async(
 ) => {
     const confirmLink = `${domainName}/auth/new-verification?token=${token}`
     const { data, error } = await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: "ITALIHUB <italihub@resend.dev>",
         to: email,
         subject: "Confirm your email",
         react: await EmailTemplate({hrefLink:confirmLink }),

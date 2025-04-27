@@ -17,7 +17,9 @@ export const Social = () => {
     }
 
     return (
-        <div className="flex items-center w-full gap-x-1 gap-y-2" >
+        <div className="flex flex-col items-center w-full" >
+            <div className="w-full h-px bg-gray-300 my-4" />
+            <div className="flex items-center w-full gap-x-1 gap-y-2">
             <Button
             size = "lg"
             className="w-1/2"
@@ -32,6 +34,7 @@ export const Social = () => {
             onClick={() => onClick("github")}>
                 <FaGithub className="h-5 w-5"/>
             </Button>
+            </div>
         </div>
     )
 }

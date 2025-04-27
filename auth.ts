@@ -1,4 +1,4 @@
-import NextAuth, { User, type DefaultSession} from "next-auth"
+import NextAuth, { AuthError, User, type DefaultSession} from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import authConfig from "@/auth.config"
 import { db } from "@/lib/db"
@@ -35,12 +35,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (!user.id) return false;
 
       // Allow OAuth users without email verification
-      if (account?.provider !== "credentials") return true;
+      if (account?.provider !== "credentials"){
+         return true;
+      }
       
       // Prevent sign in without email verification ( we also prevent inside login action too)
       const existingUser = await getUserById(user.id);
       if (!existingUser || !existingUser?.emailVerified) {
-        return false;
+        // return null;
+        throw new AuthError("",{cause: "email-not-verified"});
       }
 
       // TODO: Add 2FA check
