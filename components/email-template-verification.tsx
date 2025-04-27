@@ -17,7 +17,7 @@ import {
   }
   
   
-  export const EmailTemplate = ({
+  export const EmailTemplateVerification = ({
     hrefLink,
   }: EmailTemplateProps) => (
     <Html>
@@ -33,7 +33,7 @@ import {
             style={logo} 
              />
          </a>
-          <Text style={tertiary}>Verify Your Email</Text>
+          <Text style={tertiary}>Verify Your Email 📧</Text>
           <Heading style={secondary}>
             Click the following button to submit your account.
           </Heading>
@@ -78,7 +78,7 @@ import {
   
   const tertiary = {
     color: '#0a85ea',
-    fontSize: '11px',
+    fontSize: '15px',
     fontWeight: 700,
     fontFamily: 'HelveticaNeue,Helvetica,Arial,sans-serif',
     height: '16px',

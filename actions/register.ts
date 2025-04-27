@@ -17,24 +17,21 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         }
 
         const {name, email, password, confirmPassword} = validatedFields.data;
-        if(password !== confirmPassword){
-            return {error: "Passwords do not match!"}
-        }
 
-        const lowerCaseEmail = email.toLowerCase();
-        const existingUser = await getUserByEmail(lowerCaseEmail);
+        const toUseEmail = email.toLowerCase().trim();
+        const existingUser = await getUserByEmail(toUseEmail);
         if(existingUser){
             return {error: "User already exists!"}
         }
 
-        const hashPassword = await bcrypt.hash(password,10)
+        const hashedPassword = await bcrypt.hash(password,10)
 
 
         await db.user.create({
             data: {
                 name,
-                email: lowerCaseEmail,
-                password: hashPassword
+                email: toUseEmail,
+                password: hashedPassword
             },
         });
 
