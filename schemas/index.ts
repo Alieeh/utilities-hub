@@ -12,6 +12,9 @@ export const LoginSchema = z.object({
     .string()
     .nonempty("Password is required")
     .max(30, "Password must be at most 30 characters"),
+
+    code: z.
+    optional(z.string()),
 });
 
 
@@ -32,6 +35,7 @@ export const RegisterSchema = z.object({
     password: z
     .string()
     .nonempty("Password is required")
+    .min(8, "Password must be at least 8 characters")
     .max(30, "Password must be at most 30 characters")
     .superRefine((password, ctx) => {
         if (!/[A-Z]/.test(password)) {
@@ -86,6 +90,7 @@ export const NewPasswordSchema = z.object({
     password: z
     .string()
     .nonempty("Password is required")
+    .min(8, "Password must be at least 8 characters")
     .max(30, "Password must be at most 30 characters")
     .superRefine((password, ctx) => {
         if (!/[A-Z]/.test(password)) {

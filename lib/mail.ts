@@ -7,6 +7,27 @@ import { domainName } from "@/routes";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+
+export const sendTwoFactorTokenEmail = async (
+    email: string,
+    token: string,
+) => {
+    const { data, error } = await resend.emails.send({
+        from: "ITALIHUB <italihub@resend.dev>",
+        to: email,
+        subject: "2FA Code",
+        // TODO: Make email template for 2FA
+        // react: EmailTemplateToken({hrefLink:resetLink }),
+        html: ` <p>Your 2FA code: ${token} </p>`
+    });
+
+    if (error) {
+        return Response.json({ error }, { status: 500 });
+      }
+}
+
+
+
 export const sendPasswordResetEmail = async(
     email: string,
     token: string
