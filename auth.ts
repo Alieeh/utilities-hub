@@ -1,10 +1,11 @@
-import NextAuth, { AuthError, User, type DefaultSession} from "next-auth"
+import NextAuth, { AuthError, type DefaultSession} from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import authConfig from "@/auth.config"
 import { db } from "@/lib/db"
 import { getUserById } from "@/data/user"
 import { UserRole } from "@prisma/client"
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation"
+import { EmailVerificationError, NotExistError, TwoFactorError } from "./types/auth-error-types"
 
 declare module "next-auth" {
   interface Session {
@@ -37,20 +38,25 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       // Allow OAuth users without email verification
       if (account?.provider !== "credentials"){
          return true;
+         // it returns error inctance of CredentialsSignin
       }
       
       // Prevent sign in without email verification ( we also prevent inside login action too)
       const existingUser = await getUserById(user.id);
-      if (!existingUser || !existingUser?.emailVerified) {
-        // return null;
-        throw new AuthError("",{cause: "email-not-verified"});
+
+      if(!existingUser){
+        throw new NotExistError;
+      }
+
+      if (!existingUser?.emailVerified) {
+        throw new EmailVerificationError;
       }
 
       if (existingUser.isTwoFactorEnabled){
         const getTwoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id)
 
        if (!getTwoFactorConfirmation) {
-          throw new AuthError("",{cause: "2FA"});
+          throw new TwoFactorError;
         }
 
         // Delete two factor confirmation for next sign in

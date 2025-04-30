@@ -1,17 +1,12 @@
 import Google from "next-auth/providers/google"
 import Github from "next-auth/providers/github"
 import Credentials from "next-auth/providers/credentials"
-import { CredentialsSignin, type NextAuthConfig } from "next-auth"
+import { type NextAuthConfig } from "next-auth"
 import { LoginSchema } from "./schemas";
 import { getUserByEmail } from "./data/user";
 import bcrypt from "bcryptjs";
+import { NotExistError, PasswordError } from "./types/auth-error-types";
 
-class PassError extends CredentialsSignin {
-  code = "wrong-password"
- }
- class NotExistError extends CredentialsSignin {
-  code = "user-not-exist"
- }
 
 export default {
      providers: 
@@ -35,7 +30,7 @@ export default {
                 }
             }
             // user password is wrong
-            throw new PassError;
+            throw new PasswordError;
         }
       }),
     ]

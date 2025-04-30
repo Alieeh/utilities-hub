@@ -65,9 +65,6 @@ export const LoginForm = () => {
                     setShowTwoFactor(true);
                     form.setValue("code", "");
                 }
-            }).catch((error) => {
-                console.log("Login error in login-form: ", error)
-                setError("Something went wrong!")
             })
         })
     };
@@ -143,7 +140,7 @@ export const LoginForm = () => {
                                               : 'cursor-pointer'
                                           }`} >
                                         {cooldown > 0
-                                            ? `Resend code in ${cooldown}s`
+                                            ? `Resend code | ${cooldown}s`
                                             : 'Resend code?'
                                         }
                                     </span>

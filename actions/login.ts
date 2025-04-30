@@ -11,6 +11,7 @@ import { sendVerificationEmail, sendTwoFactorTokenEmail } from "@/lib/mail";
 import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { db } from "@/lib/db";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
+import { EmailVerificationError, NotExistError, PasswordError, TwoFactorError } from "@/types/auth-error-types";
 
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
@@ -24,11 +25,11 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
     const existingUser = await getUserByEmail(email);
     if(!existingUser || !existingUser.email || !existingUser.password){
-        return {error: "Invalid credentials! > inside login action"}
+        return {error: "Invalid credentials!"}
     }
 
     if (existingUser.isTwoFactorEnabled && code){
-        // Verify code
+        // Sending verification code
         const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
         if (!twoFactorToken){
             return { error: "First Login!"}
@@ -44,6 +45,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         await db.twoFactorToken.delete({
             where: { id: twoFactorToken.id }
         });
+
         const existingConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
 
         if (existingConfirmation) {
@@ -66,59 +68,66 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             password: password,
             redirectTo: DEFAULT_LOGIN_REDIRECT,
         });
-
     }catch (error) {
-        console.log("auth.config error triggered :")
-        if (error instanceof CredentialsSignin) {
-            console.log(error.name)
-            switch (error.code) {
-                case "user-not-exist":
-                    // the error for second checking of user existing in database triggered
-                    console.log(`code: ${error.code}`)
-                    return {error: "Invalid credentials!"};
-                
-                case "wrong-password":
-                    console.log(`code: ${error.code}`)
-                    return {error: "Invalid credentials!"};
-                
-                default:
-                    return {error: "Something went wrong!"};
-                }
-
-        }else if(error instanceof AuthError){
-            console.log(error.name)
-            switch (error.cause){
-                case "email-not-verified" :
-                    console.log(error.cause);
-                    const verificationToken = await generateVerificationToken(existingUser.email);
-                    console.log("Sending again email verification to user: " + verificationToken.email)
-                    await sendVerificationEmail(
-                        verificationToken.email,
-                        verificationToken.token
-                    );
-                    console.log("Email has been sent!")
-                    return {
-                        error: "You have not confirmed your email yet!",
-                        success: "Confirmation email has been sent again!"
-                    }
-                case "2FA" :
-                    console.log(error.cause);
-                    if (existingUser.isTwoFactorEnabled && existingUser.email) {
-                        const twoFactorToken = await generateTwoFactorToken(existingUser.email);
-                        console.log("Sending 2FA email to user: " + existingUser.email)
-                        await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token);
-                        return { 
-                            twoFactor: true,
-                            success: "Code has been sent to your email!"
-                        }
-                    }
-                    return {
-                        error: "Something went wrong with 2FA !",
-                    }
-                default:
-                    return {error: "Something went wrong!"}
-            } 
+        if (error instanceof PasswordError){
+            console.log(error.message);
+            return {error: "Invalid credentials!"};
         }
+
+        if (error instanceof NotExistError){
+            console.log(error.message);
+            return {error: "Invalid credentials!"};
+        }
+
+        if (error instanceof EmailVerificationError){
+            console.log(error.message);
+            const verificationToken = await generateVerificationToken(existingUser.email);
+            if (!verificationToken) {
+                console.log("ERROR: generateVerificationToken")
+                return { error: "Something went wrong!"}
+            }
+            console.log("Resending email verification to user: " + verificationToken.email)
+            await sendVerificationEmail(
+                verificationToken.email,
+                verificationToken.token
+            ).catch((error) => {
+                console.log(error);
+                return { error: "Something went wrong!" }
+            });
+            console.log("Email has been sent!")
+            return {
+                error: "You have not confirmed your email yet!",
+                success: "Confirmation email has been sent again!"
+            }   
+        }
+
+        if (error instanceof TwoFactorError){
+            console.log(error.message);
+            if (existingUser.isTwoFactorEnabled && existingUser.email) {
+                const twoFactorToken = await generateTwoFactorToken(existingUser.email);
+                if(!twoFactorToken){
+                    console.log("ERROR: generateTwoFactorToken");
+                    return {error: "Something went wrong!"}
+                }
+                console.log("Sending 2FA email to user: " + existingUser.email)
+                await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token)
+                .catch((error) => {
+                    console.log(error);
+                    return {error: "Something went wrong!"}
+                });
+                return { 
+                    twoFactor: true,
+                    success: "Code has been sent to your email!"
+                }
+            }else{
+                console.log("ERROR: existingUser 2FA functions missed")
+                return {
+                    error: "Something went wrong with 2FA !",
+                }
+            }
+        }
+        console.log("ERROR: Unspecified type of auth error")
+
         // redirecting doesnt work properly without line below
         throw error;
     }
